@@ -1,7 +1,7 @@
 import re, urlparse, itertools
 from calibre.ebooks.BeautifulSoup import NavigableString, Tag
 from datetime import date, timedelta
-
+'''
 language = 'en'
 
 site_url = 'http://www.infoq.com/'
@@ -22,8 +22,8 @@ date_regexes = [
     r'Nov\s+(?P<day>\d{2}),\s+(?P<year>\d{4})',
     r'Dec\s+(?P<day>\d{2}),\s+(?P<year>\d{4})'
 ]
-
 '''
+
 language = 'zh'
 
 site_url = 'http://www.infoq.com/cn/'
@@ -44,14 +44,13 @@ date_regexes = [
     r'十一月\s+(?P<day>\d{2}),\s+(?P<year>\d{4})',
     r'十二月\s+(?P<day>\d{2}),\s+(?P<year>\d{4})'
 ]
-'''
+
 
 # the sections to download
 sections = [ 'news', 'articles', 'interviews' ]
 
 # the range of date (both inclusive) to download
-date_range = (date(2013, 6, 20), date(2013, 6, 22))
-
+date_range = (date(2014, 1, 1),  date.today())
 # the range of date to override for sections
 section_date_ranges = {
     # 'news': (date(2013, 6, 21), date(2013, 6, 22)),
@@ -93,14 +92,14 @@ def generate_title(prefix):
     return text
 
 def parse_date(text):
-    for i in xrange(len(date_regexes)):
-        m = re.search(date_regexes[i], text)
+    l = len(date_regexes)
+    for i in xrange(l):
+        m = re.search(date_regexes[l-1-i], text)
         if not m: continue
-        
+
         year = int(m.group('year'))
-        month = i + 1
+        month = l - i
         day = int(m.group('day'))
-        
         return date(year, month, day)
 
 def get_text(tag):
@@ -193,8 +192,11 @@ class InfoQ(BasicNewsRecipe):
             for item in self.get_items(sec):
                 date = item['date']
                 
-                if date > end: continue
-                if date < begin: break
+                if date:
+                    if date > end: continue
+                    if date < begin: break
+                else:
+                    continue
 
                 item_list.append(item)
             
